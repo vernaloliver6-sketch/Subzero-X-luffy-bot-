@@ -1,6 +1,6 @@
-
 const { default: makeWASocket, useMultiFileAuthState, downloadContentFromMessage } = require("@whiskeysockets/baileys");
 const qrcode = require("qrcode-terminal");
+const QRCode = require("qrcode");
 const fs = require("fs");
 const express = require("express");
 
@@ -14,20 +14,28 @@ let latestQR = ""; // ✅ STOCK QR
 
 app.get("/", (req,res)=>{
   res.send(`
-  <h2>🤖 BOT ONLINE - SUBZERO X LUFFY-BOT </h2>
-  <a href="/qr">👉 Gade QR Code</a>
+  <html>
+  <body style="background:black;color:white;text-align:center">
+    <h2>🤖 BOT ONLINE - SUBZERO X LUFFY 👑</h2>
+    <p><a href="/qr" style="color:cyan">👉 Gade QR Code</a></p>
+  </body>
+  </html>
   `);
 });
 
-// ✅ ROUTE QR
+// ✅ ROUTE QR FIX
 app.get("/qr", (req,res)=>{
   if(!latestQR){
     return res.send("⌛ QR poko pare...");
   }
 
   res.send(`
-    <h3>Scan QR la ak WhatsApp</h3>
-    <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${latestQR}" />
+    <html>
+    <body style="background:black;color:white;text-align:center">
+      <h2>📱 Scan QR la ak WhatsApp</h2>
+      <img src="${latestQR}" />
+    </body>
+    </html>
   `);
 });
 
@@ -42,17 +50,18 @@ async function startBot(){
 
   sock.ev.on("creds.update", saveCreds);
 
-  sock.ev.on("connection.update", (update)=>{
+  sock.ev.on("connection.update", async (update)=>{
     const { connection, qr } = update;
 
     if(qr){
-      latestQR = qr; // ✅ SAVE QR
+      latestQR = await QRCode.toDataURL(qr); // ✅ FIX QR
       qrcode.generate(qr, {small:true});
-      console.log("📱 Scan QR sou /qr");
+      console.log("📱 QR READY sou /qr");
     }
 
     if(connection === "open"){
       console.log("✅ BOT CONNECTED");
+      latestQR = ""; // retire QR
     }
   });
 
@@ -69,7 +78,7 @@ async function startBot(){
     // ================= MENU =================
     if(text === ".menu"){
       await sock.sendMessage(from,{
-        text:`👑 SUBZERO X LUFFY 👑
+        text:`👑 SUBZERO X LUFFY-BOT 👑
 
 .menu
 .ping
