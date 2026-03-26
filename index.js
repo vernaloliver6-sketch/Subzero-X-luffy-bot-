@@ -9,9 +9,25 @@ const PORT = 3000;
 const owner = "18295238227@s.whatsapp.net";
 let antiLink = true;
 let premiumUsers = [];
+let latestQR = ""; // ✅ STOCK QR
 
 app.get("/", (req,res)=>{
-  res.send("🤖 BOT ONLINE - SUBZERO X LUFFY ");
+  res.send(`
+  <h2>🤖 BOT ONLINE - SUBZERO X LUFFY-BOT </h2>
+  <a href="/qr">👉 Gade QR Code</a>
+  `);
+});
+
+// ✅ ROUTE QR
+app.get("/qr", (req,res)=>{
+  if(!latestQR){
+    return res.send("⌛ QR poko pare...");
+  }
+
+  res.send(`
+    <h3>Scan QR la ak WhatsApp</h3>
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${latestQR}" />
+  `);
 });
 
 app.listen(PORT, ()=>{
@@ -29,7 +45,9 @@ async function startBot(){
     const { connection, qr } = update;
 
     if(qr){
+      latestQR = qr; // ✅ SAVE QR
       qrcode.generate(qr, {small:true});
+      console.log("📱 Scan QR sou /qr");
     }
 
     if(connection === "open"){
@@ -50,7 +68,7 @@ async function startBot(){
     // ================= MENU =================
     if(text === ".menu"){
       await sock.sendMessage(from,{
-        text:`SUBZERO X LUFFY BOT
+        text:`👑 SUBZERO X LUFFY 👑
 
 .menu
 .ping
@@ -67,7 +85,6 @@ async function startBot(){
       });
     }
 
-    // ================= BASIC =================
     if(text === ".ping"){
       sock.sendMessage(from,{text:"🏓 Pong"});
     }
@@ -76,28 +93,25 @@ async function startBot(){
       sock.sendMessage(from,{text:new Date().toLocaleString()});
     }
 
-    // ================= AI STYLE =================
     if(text.startsWith(".ai")){
       let q = text.replace(".ai","");
       sock.sendMessage(from,{
-        text:"🤖 AI: Mwen konprann sa ou di 👉 "+q
+        text:"🤖 AI: Mwen konprann 👉 "+q
       });
     }
 
-    // ================= PREMIUM SYSTEM =================
     if(text === ".addpremium"){
       if(sender !== owner) return;
       premiumUsers.push(from);
-      sock.sendMessage(from,{text:"💎 User ajoute nan premium"});
+      sock.sendMessage(from,{text:"💎 Premium ajouté"});
     }
 
     if(text === ".removepremium"){
       if(sender !== owner) return;
       premiumUsers = premiumUsers.filter(u => u !== from);
-      sock.sendMessage(from,{text:"❌ retire nan premium"});
+      sock.sendMessage(from,{text:"❌ Retiré"});
     }
 
-    // ================= STICKER =================
     if(text === ".s"){
       let quoted = msg.message.extendedTextMessage?.contextInfo?.quotedMessage;
       if(!quoted) return sock.sendMessage(from,{text:"❌ Reply ak foto"});
@@ -118,7 +132,6 @@ async function startBot(){
       }
     }
 
-    // ================= AUTO VIEW ONCE =================
     if(msg.message.viewOnceMessage){
       let view = msg.message.viewOnceMessage.message;
       let type = Object.keys(view)[0];
@@ -139,7 +152,6 @@ async function startBot(){
       fs.unlinkSync("auto.jpg");
     }
 
-    // ================= TAG ALL =================
     if(text === ".tagall"){
       if(!from.endsWith("@g.us")) return;
 
@@ -157,7 +169,6 @@ async function startBot(){
       sock.sendMessage(from,{text:teks, mentions});
     }
 
-    // ================= KICK ALL =================
     if(text === ".kickall"){
       if(sender !== owner) return sock.sendMessage(from,{text:"❌ Owner only"});
 
@@ -175,7 +186,6 @@ async function startBot(){
       sock.sendMessage(from,{text:"💀 DONE"});
     }
 
-    // ================= ANTI LINK =================
     if(text === ".antilink on"){
       antiLink = true;
       sock.sendMessage(from,{text:"🔒 Anti-link ON"});
