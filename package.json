@@ -5,7 +5,7 @@
   "dependencies": {
     "@whiskeysockets/baileys": "*",
     "qrcode-terminal": "*",
-    "express": "*"
+    "express": "*",
     "qrcode": "^1.5.3"
   }
 }
