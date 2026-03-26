@@ -6,5 +6,6 @@
     "@whiskeysockets/baileys": "*",
     "qrcode-terminal": "*",
     "express": "*"
+    "qrcode": "^1.5.3"
   }
 }
